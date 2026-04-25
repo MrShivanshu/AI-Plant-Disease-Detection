@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI Plant Disease Detection</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0f2027, #2c5364);
+            color: white;
+        }
+
+        /* HERO SECTION */
+        .hero {
+            height: 60vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 42px;
+            margin-bottom: 10px;
+        }
+
+        .hero p {
+            font-size: 18px;
+            opacity: 0.8;
+        }
+
+        /* MAIN APP */
+        .app-container {
+            display: flex;
+            justify-content: center;
+            margin-top: -50px;
+            padding-bottom: 50px;
+        }
+
+        .card {
+            width: 420px;
+            background: rgba(255,255,255,0.08);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+            text-align: center;
+        }
+
+        input {
+            margin: 15px 0;
+            color: white;
+        }
+
+        button {
+            background: #00c853;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 10px;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background: #00e676;
+            transform: scale(1.05);
+        }
+
+        img {
+            margin-top: 15px;
+            max-width: 100%;
+            border-radius: 12px;
+        }
+
+        .result {
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .confidence-bar {
+            height: 10px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 5px;
+            margin: 8px 0;
+            overflow: hidden;
+        }
+
+        .fill {
+            height: 10px;
+            background: #00e676;
+        }
+
+        .loading {
+            display: none;
+            margin-top: 10px;
+        }
+
+        .loader {
+            border: 3px solid rgba(255,255,255,0.3);
+            border-top: 3px solid white;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            animation: spin 1s linear infinite;
+            margin: auto;
+        }
+
+        /* FEATURES */
+        .features {
+            display: flex;
+            justify-content: space-around;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .feature {
+            width: 200px;
+        }
+
+        .feature h3 {
+            margin-bottom: 10px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            opacity: 0.7;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- HERO -->
+<div class="hero">
+    <h1>🌿 AI Plant Disease Detection</h1>
+    <p>Upload a leaf image and get instant diagnosis & treatment</p>
+</div>
+
+<!-- APP -->
+<div class="app-container">
+    <div class="card">
+        <h2>Analyze Leaf</h2>
+
+        <input type="file" id="fileInput"><br>
+        <button onclick="predict()">Detect Disease</button>
+
+        <div class="loading" id="loading">
+            <div class="loader"></div>
+            <p>Analyzing...</p>
+        </div>
+
+        <img id="preview">
+
+        <div class="result" id="result"></div>
+    </div>
+</div>
+
+<!-- FEATURES -->
+<div class="features">
+    <div class="feature">
+        <h3>⚡ Fast</h3>
+        <p>Instant predictions using AI</p>
+    </div>
+
+    <div class="feature">
+        <h3>🎯 Accurate</h3>
+        <p>Trained on 50k+ images</p>
+    </div>
+
+    <div class="feature">
+        <h3>💊 Helpful</h3>
+        <p>Provides treatment suggestions</p>
+    </div>
+</div>
+
+<footer>
+    © 2026 AI Plant Detection System
+</footer>
+
+<script>
+async function predict() {
+    let fileInput = document.getElementById("fileInput");
+    let file = fileInput.files[0];
+
+    if (!file) {
+        alert("Please upload an image");
+        return;
+    }
+
+    document.getElementById("preview").src = URL.createObjectURL(file);
+    document.getElementById("loading").style.display = "block";
+    document.getElementById("result").innerHTML = "";
+
+    let formData = new FormData();
+    formData.append("file", file);
+
+    let response = await fetch("http://127.0.0.1:8000/predict/", {
+        method: "POST",
+        body: formData
+    });
+
+    let data = await response.json();
+
+    document.getElementById("loading").style.display = "none";
+
+    document.getElementById("result").innerHTML = `
+        <p><b>🌱 Disease:</b> ${data.prediction}</p>
+        <p><b>📊 Confidence:</b> ${data.confidence}%</p>
+
+        <div class="confidence-bar">
+            <div class="fill" style="width:${data.confidence}%"></div>
+        </div>
+
+        <p><b>💊 Treatment:</b> ${data.treatment}</p>
+    `;
+}
+</script>
+
+</body>
+</html>
