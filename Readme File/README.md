@@ -39,4 +39,5 @@ http://127.0.0.1:8000/
 
 ## Author
 
-Shivanshu,Suraj Veer
+Shivanshu(2210992329),Suraj Veer(2210990878)
+Current Status:Submitted Manuscript in JMLR
